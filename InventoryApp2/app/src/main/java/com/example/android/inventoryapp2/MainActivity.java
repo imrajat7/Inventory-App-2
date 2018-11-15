@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.android.inventoryapp2.data.BookContract.BookEntry;
 
@@ -134,5 +135,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void deleteAllBooks() {
         int rowsDeleted = getContentResolver().delete(BookEntry.CONTENT_URI, null, null);
         Log.v("MainActivity", rowsDeleted + " rows deleted from book database");
+    }
+
+    public void productSaleCount(int productID, int bookQuantity) {
+        bookQuantity = bookQuantity - 1;
+        if (bookQuantity > 0) {
+            ContentValues values = new ContentValues();
+            values.put(BookEntry.COLUMN_BOOK_QUANTITY, bookQuantity);
+            Uri updateUri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, productID);
+            int rowsAffected = getContentResolver().update(updateUri, values, null, null);
+            Toast.makeText(this, "Quantity was change", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Product was finish :( , buy another Product", Toast.LENGTH_SHORT).show();
+        }
     }
 }

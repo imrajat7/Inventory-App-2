@@ -92,14 +92,6 @@
                 android:inputType="number" />
 
             <Button
-                android:id="@+id/sale_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/string_sale"
-                android:visibility="invisible" />
-
-            <Button
                 android:id="@+id/call_supplier"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

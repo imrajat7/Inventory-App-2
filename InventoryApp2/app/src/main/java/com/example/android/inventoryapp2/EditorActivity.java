@@ -30,17 +30,15 @@ public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EXISTING_BOOK_LOADER = 0;
-    public int check = -1;
+    public EditText mQuantityEditText;
     private Uri mCurrentBookUri;
     private EditText mNameEditText;
     private EditText mPriceEditText;
-    private EditText mQuantityEditText;
     private EditText mSupplierEditText;
     private EditText mNumberEditText;
-    private Button incrementButton;
-    private Button decrementButton;
-    private Button saleButton;
-    private Button callSupplierButton;
+    private Button mIncrementButton;
+    private Button mDecrementButton;
+    private Button mCallSupplierButton;
     private boolean mBookHasChanged = false;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
@@ -63,7 +61,6 @@ public class EditorActivity extends AppCompatActivity
             setTitle("Add a Book");
             invalidateOptionsMenu();
         } else {
-            check = 1;
             setTitle("Details of Book");
             getLoaderManager().initLoader(EXISTING_BOOK_LOADER, null, this);
         }
@@ -73,17 +70,18 @@ public class EditorActivity extends AppCompatActivity
         mQuantityEditText = findViewById(R.id.edit_book_quantity);
         mSupplierEditText = findViewById(R.id.edit_supplier_name);
         mNumberEditText = findViewById(R.id.edit_suplier_phone);
-        incrementButton = findViewById(R.id.increment_quantity);
-        decrementButton = findViewById(R.id.decrement_quantity);
-        saleButton = findViewById(R.id.sale_button);
-        callSupplierButton = findViewById(R.id.call_supplier);
+        mIncrementButton = findViewById(R.id.increment_quantity);
+        mDecrementButton = findViewById(R.id.decrement_quantity);
+        mCallSupplierButton = findViewById(R.id.call_supplier);
 
-        incrementButton.setOnTouchListener(mTouchListener);
-        decrementButton.setOnTouchListener(mTouchListener);
-        saleButton.setOnTouchListener(mTouchListener);
-        callSupplierButton.setOnTouchListener(mTouchListener);
+        if (getTitle() == "Details of Book")
+            mCallSupplierButton.setVisibility(View.VISIBLE);
 
-        incrementButton.setOnClickListener(new View.OnClickListener() {
+        mIncrementButton.setOnTouchListener(mTouchListener);
+        mDecrementButton.setOnTouchListener(mTouchListener);
+        mCallSupplierButton.setOnTouchListener(mTouchListener);
+
+        mIncrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int currentValue = Integer.parseInt(mQuantityEditText.getText().toString());
@@ -92,31 +90,20 @@ public class EditorActivity extends AppCompatActivity
             }
         });
 
-        decrementButton.setOnClickListener(new View.OnClickListener() {
+        mDecrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int currentValue = Integer.parseInt(mQuantityEditText.getText().toString());
-                if (currentValue > 0) {
-                    int decreasedValue = currentValue - 1;
-                    mQuantityEditText.setText(String.valueOf(decreasedValue));
-                }
-            }
-        });
-
-        saleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int currentValue = Integer.parseInt(mQuantityEditText.getText().toString());
-                if (currentValue > 0) {
+                if (currentValue > 1) {
                     int decreasedValue = currentValue - 1;
                     mQuantityEditText.setText(String.valueOf(decreasedValue));
                 } else {
-                    Toast.makeText(EditorActivity.this, "Cannot be Negative", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditorActivity.this, "Cannot be less than 1", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        callSupplierButton.setOnClickListener(new View.OnClickListener() {
+        mCallSupplierButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int currentValue = Integer.parseInt(mNumberEditText.getText().toString());
@@ -125,11 +112,6 @@ public class EditorActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-    }
-
-    int convert(String normal) {
-        int need = Integer.parseInt(normal);
-        return need;
     }
 
     private void saveBook() {
@@ -157,17 +139,16 @@ public class EditorActivity extends AppCompatActivity
         } catch (NumberFormatException n) {
         }
 
-
         if (TextUtils.isEmpty(nameString)) {
-            mNameEditText.setError("The Book Name cannot be blank");
-        } else if (price < 0) {
-            mPriceEditText.setError("Price cannot be less than zero");
+            Toast.makeText(this, getString(R.string.toast_text_name), Toast.LENGTH_SHORT).show();
+        } else if (price < 0 || TextUtils.isEmpty(priceString)) {
+            Toast.makeText(this, getString(R.string.toast_text_price), Toast.LENGTH_SHORT).show();
         } else if (quantity < 0) {
-            mQuantityEditText.setError("Quantity cannot be less than zero");
+            Toast.makeText(this, getString(R.string.toast_text_quantity), Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(supplierString)) {
-            mSupplierEditText.setError("Supplier name cannot be empty");
+            Toast.makeText(this, getString(R.string.toast_text_supplier), Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(numberString)) {
-            mNumberEditText.setError("Supplier number cannot be empty");
+            Toast.makeText(this, getString(R.string.toast_text_number), Toast.LENGTH_SHORT).show();
         } else {
             // Create a ContentValues object where column names are the keys,
             // and book attributes from the editor are the values.
@@ -210,6 +191,7 @@ public class EditorActivity extends AppCompatActivity
                             Toast.LENGTH_SHORT).show();
                 }
             }
+            finish();
         }
     }
 
@@ -375,6 +357,7 @@ public class EditorActivity extends AppCompatActivity
         builder.setMessage(R.string.delete_dialog_msg);
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                finish();
                 deleteBook();
             }
         });
